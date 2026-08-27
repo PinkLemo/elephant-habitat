@@ -4,6 +4,7 @@ import PublicNavbar from '@/layouts/components/PublicNavbar.vue'
 import MapCanvas from '@/components/map/MapCanvas.vue'
 import { useSightingsData } from '@/composables/useSightingsData'
 import { COUNTRY_NAMES, COUNTRY_THEME_COLORS, COUNTRY_COLORS } from '@/composables/useCountryColors'
+import Footer from "@/layouts/components/Footer.vue";
 
 definePageMeta({
   path: '/explore-data',
@@ -238,6 +239,10 @@ const yearRange = computed(() => {
       </template>
     </VContainer>
   </div>
+  <!-- ═══════════════════════════════════════════════════════════ FOOTER ═══ -->
+  <section class="ma-6">
+    <Footer />
+  </section>
 </template>
 
 <style lang="scss" scoped>

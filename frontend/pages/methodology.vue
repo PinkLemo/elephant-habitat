@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import PublicNavbar from '@/layouts/components/PublicNavbar.vue'
+import Footer from "@/layouts/components/Footer.vue";
 
 definePageMeta({
   path: '/methodology',
@@ -465,6 +466,10 @@ const downloads = ref([
       </VCard>
     </VContainer>
   </div>
+  <!-- ═══════════════════════════════════════════════════════════ FOOTER ═══ -->
+  <section class="ma-6">
+    <Footer />
+  </section>
 </template>
 
 <style lang="scss" scoped>

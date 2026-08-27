@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import PublicNavbar from '@/layouts/components/PublicNavbar.vue'
+import Footer from "@/layouts/components/Footer.vue";
 
 definePageMeta({
   path: '/',
@@ -76,7 +77,10 @@ const statData = ref([
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════════════ STATS ═══ -->
+    <!-- ═══════════════════════════════════════════════════════════ FOOTER ═══ -->
+    <section class="ma-6">
+      <Footer />
+    </section>
   </div>
 </template>
 

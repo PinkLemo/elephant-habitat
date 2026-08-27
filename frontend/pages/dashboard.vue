@@ -3,6 +3,7 @@ import {onMounted, ref, watch} from 'vue'
 import PublicNavbar from '@/layouts/components/PublicNavbar.vue'
 import MapCanvas from '@/components/map/MapCanvas.vue'
 import {useSightingsData} from '@/composables/useSightingsData'
+import Footer from "@/layouts/components/Footer.vue";
 
 definePageMeta({
   path: '/dashboard',
@@ -220,6 +221,10 @@ watch(season, (newSeason) => {
       </VRow>
     </VContainer>
   </div>
+  <!-- ═══════════════════════════════════════════════════════════ FOOTER ═══ -->
+  <section class="ma-6">
+    <Footer />
+  </section>
 </template>
 
 <style lang="scss" scoped>
