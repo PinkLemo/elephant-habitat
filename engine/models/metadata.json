@@ -1,0 +1,19 @@
+{
+  "trained_at": "2026-08-27T09:09:42.215003+00:00",
+  "sklearn_version": "1.8.0",
+  "feature_order": [
+    "elevation",
+    "dist_to_water_km",
+    "season_encoded",
+    "ndvi_proxy"
+  ],
+  "spatial_cv_auc_mean": 0.8968064665904014,
+  "spatial_cv_auc_std": 0.05553450546229284,
+  "feature_importances": {
+    "elevation": 0.18252045080897872,
+    "dist_to_water_km": 0.33042987039697536,
+    "season_encoded": 0.004995403610147488,
+    "ndvi_proxy": 0.4820542751838985
+  },
+  "n_training_records": 3067
+}
