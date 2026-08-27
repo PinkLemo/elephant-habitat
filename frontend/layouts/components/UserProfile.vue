@@ -6,35 +6,21 @@ const userProfileList = [
   { type: 'divider' },
   {
     type: 'navItem',
-    icon: 'ri-user-line',
-    title: 'Profile',
-    href: '#',
+    icon: 'ri-global-line',
+    title: 'Portfolio Website',
+    href: 'https://my-portfolio-vue-steel.vercel.app/',
   },
   {
     type: 'navItem',
-    icon: 'ri-settings-4-line',
-    title: 'Settings',
-    href: '#',
+    icon: 'ri-github-line',
+    title: 'GitHub Repository',
+    href: 'https://github.com/PinkLemo/elephant-habitat',
   },
   {
     type: 'navItem',
-    icon: 'ri-file-text-line',
-    title: 'Billing Plan',
-    href: '#',
-    chipsProps: { color: 'error', text: '4', size: 'small' },
-  },
-  { type: 'divider' },
-  {
-    type: 'navItem',
-    icon: 'ri-money-dollar-circle-line',
-    title: 'Pricing',
-    href: '#',
-  },
-  {
-    type: 'navItem',
-    icon: 'ri-question-line',
-    title: 'FAQ',
-    href: '#',
+    icon: 'ri-linkedin-box-line',
+    title: 'LinkedIn',
+    href: 'https://www.linkedin.com/in/daliso-miti-805b8323a/',
   },
 ]
 </script>
@@ -71,10 +57,10 @@ const userProfileList = [
 
               <div>
                 <div class="text-body-2 font-weight-medium text-high-emphasis">
-                  John Doe
+                  Daliso Rumbi Miti
                 </div>
                 <div class="text-capitalize text-caption text-disabled">
-                  Admin
+                  Data Science Researcher and Full Stack Software Engineer
                 </div>
               </div>
             </div>
@@ -88,6 +74,9 @@ const userProfileList = [
               <VListItem
                 v-if="item.type === 'navItem'"
                 class="px-4"
+                :href="item.href"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 <template #prepend>
                   <VIcon
@@ -97,16 +86,6 @@ const userProfileList = [
                 </template>
 
                 <VListItemTitle>{{ item.title }}</VListItemTitle>
-
-                <template
-                  v-if="item.chipsProps"
-                  #append
-                >
-                  <VChip
-                    v-bind="item.chipsProps"
-                    variant="elevated"
-                  />
-                </template>
               </VListItem>
 
               <VDivider
@@ -114,18 +93,6 @@ const userProfileList = [
                 class="my-1"
               />
             </template>
-
-            <VListItem class="px-4">
-              <VBtn
-                block
-                color="error"
-                size="small"
-                append-icon="ri-logout-box-r-line"
-                :to="{ name: 'login' }"
-              >
-                Logout
-              </VBtn>
-            </VListItem>
           </PerfectScrollbar>
         </VList>
       </VMenu>

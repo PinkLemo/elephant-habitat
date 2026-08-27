@@ -5,6 +5,7 @@ import navItems from '@/navigation/horizontal'
 import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
+import UserProfile from "@/layouts/components/UserProfile.vue";
 
 const display = useDisplay()
 const route = useRoute()
@@ -61,6 +62,7 @@ const sidebar = ref(false)
 
         <div class="d-flex gap-x-3 align-center">
           <NavbarThemeSwitcher class="me-0 me-sm-1" />
+          <UserProfile />
         </div>
       </VAppBar>
     </div>
