@@ -1,0 +1,16 @@
+{
+  "Total Records": 3067,
+  "Countries": [
+    "Zimbabwe",
+    "Zambia",
+    "Mozambique",
+    "Botswana"
+  ],
+  "DBSCAN Clusters": 12,
+  "Clustered Records": 3041,
+  "Noise Points": 26,
+  "Spatial CV AUC Mean": 0.885,
+  "Spatial CV AUC Std": 0.0772,
+  "Top Feature": "NDVI Proxy (0.4861)",
+  "Second Feature": "Distance to Water (0.3204)"
+}
