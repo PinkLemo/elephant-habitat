@@ -24,8 +24,8 @@ const statData = ref([
     <PublicNavbar />
 
     <!-- ═══════════════════════════════════════════════════════════ HERO ═══ -->
-    <section id="home" class="hero-section" :style="{ 'background-color': 'rgb(var(--v-theme-surface))' }">
-      <div class="landing-hero">
+    <section id="home" class="hero-section mb-0" :style="{ 'background-color': 'rgb(var(--v-theme-surface))' }">
+      <div class="landing-hero ">
         <VContainer>
           <div class="text-center pt-10 pb-16">
             <VChip color="primary" variant="tonal" size="small" class="mb-4 text-uppercase font-weight-bold" label>
@@ -54,28 +54,29 @@ const statData = ref([
           </div>
         </VContainer>
       </div>
+      <!-- ═══════════════════════════════════════════════════════════ STATS ═══ -->
+      <div :style="{ 'background-color': 'rgb(var(--v-theme-surface))' }">
+        <VContainer>
+          <div class="py-14">
+            <VRow>
+              <VCol v-for="(stat, index) in statData" :key="index" cols="12" sm="6" md="3">
+                <VCard flat border>
+                  <VCardText class="text-center">
+                    <VAvatar size="56" :color="stat.color" variant="tonal" class="mb-4" rounded>
+                      <VIcon :icon="stat.icon" size="28" />
+                    </VAvatar>
+                    <div class="product-stat-text">{{ stat.value }}</div>
+                    <div class="text-body-2 font-weight-medium text-medium-emphasis mt-1">{{ stat.title }}</div>
+                  </VCardText>
+                </VCard>
+              </VCol>
+            </VRow>
+          </div>
+        </VContainer>
+      </div>
     </section>
 
     <!-- ═══════════════════════════════════════════════════════════ STATS ═══ -->
-    <div :style="{ 'background-color': 'rgb(var(--v-theme-surface))' }">
-      <VContainer>
-        <div class="py-14">
-          <VRow>
-            <VCol v-for="(stat, index) in statData" :key="index" cols="12" sm="6" md="3">
-              <VCard flat border>
-                <VCardText class="text-center">
-                  <VAvatar size="56" :color="stat.color" variant="tonal" class="mb-4" rounded>
-                    <VIcon :icon="stat.icon" size="28" />
-                  </VAvatar>
-                  <div class="product-stat-text">{{ stat.value }}</div>
-                  <div class="text-body-2 font-weight-medium text-medium-emphasis mt-1">{{ stat.title }}</div>
-                </VCardText>
-              </VCard>
-            </VCol>
-          </VRow>
-        </div>
-      </VContainer>
-    </div>
   </div>
 </template>
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import {onMounted, ref, watch} from 'vue'
 import PublicNavbar from '@/layouts/components/PublicNavbar.vue'
 import MapCanvas from '@/components/map/MapCanvas.vue'
-import { useSightingsData } from '@/composables/useSightingsData'
+import {useSightingsData} from '@/composables/useSightingsData'
 
 definePageMeta({
   path: '/dashboard',
@@ -10,7 +10,7 @@ definePageMeta({
   public: true,
 })
 
-useHead({ title: 'Dashboard — Elephant Habitat' })
+useHead({title: 'Dashboard — Elephant Habitat'})
 
 // ─── Season toggle ─────────────────────────────────────────────────────────
 const season = ref<'wet' | 'dry'>('wet')
@@ -38,17 +38,17 @@ const prediction = ref<{
 })
 
 // ─── Load sightings data ──────────────────────────────────────────────────
-const { sightings, loading, error, loadSightings } = useSightingsData()
+const {sightings, loading, error, loadSightings} = useSightingsData()
 
 onMounted(() => {
   loadSightings()
 })
 
 // ─── Handle point selection from map ──────────────────────────────────────
-const { predictPoint, loading: predicting, error: predictError } = usePredictApi()
+const {predictPoint, loading: predicting, error: predictError} = usePredictApi()
 
 const fetchPrediction = async (lat: number, lon: number, seasonValue: 'wet' | 'dry') => {
-  prediction.value = { suitability: null, elevation: null, ndvi: null, distToWater: null }
+  prediction.value = {suitability: null, elevation: null, ndvi: null, distToWater: null}
 
   try {
     const result = await predictPoint(lat, lon, seasonValue)
@@ -58,14 +58,13 @@ const fetchPrediction = async (lat: number, lon: number, seasonValue: 'wet' | 'd
       ndvi: result.ndvi_proxy,
       distToWater: result.dist_to_water_km,
     }
-  }
-  catch {
+  } catch {
     // predictError.value is already set by the composable — surface it in the template below
   }
 }
 
 const handlePointSelected = (lat: number, lon: number) => {
-  selectedPoint.value = { lat, lon }
+  selectedPoint.value = {lat, lon}
   fetchPrediction(lat, lon, season.value)
 }
 
@@ -79,24 +78,35 @@ watch(season, (newSeason) => {
 
 <template>
   <div class="dashboard-page-wrapper">
-    <PublicNavbar />
+    <PublicNavbar class="mb-15"/>
 
     <VContainer fluid class="py-6">
       <VRow>
         <!-- ── Sidebar controls ──────────────────────────────────────────── -->
+        <!-- ── Sidebar controls ──────────────────────────────────────────── -->
         <VCol cols="12" md="3">
-          <div class="d-flex flex-column gap-y-6">
+          <div class="d-flex flex-column gap-y-3">
+
+            <VCard flat border>
+              <VCardText class="pb-0">
+                <div class="text-overline text-medium-emphasis mb-3">Interactive Habitat Suitability Dashboard</div>
+                <p class="text-body-1 font-weight-medium">
+                  Click any point to predict habitat
+                  suitability, or toggle map layers to explore patterns.
+                </p>
+              </VCardText>
+            </VCard>
 
             <VCard flat border>
               <VCardText>
                 <div class="text-overline text-medium-emphasis mb-3">Season</div>
                 <VTabs v-model="season" class="v-tabs-pill" density="comfortable" grow>
                   <VTab value="wet">
-                    <VIcon start icon="ri-drop-line" />
+                    <VIcon start icon="ri-drop-line"/>
                     Wet
                   </VTab>
                   <VTab value="dry">
-                    <VIcon start icon="ri-sun-line" />
+                    <VIcon start icon="ri-sun-line"/>
                     Dry
                   </VTab>
                 </VTabs>
@@ -130,7 +140,7 @@ watch(season, (newSeason) => {
             <VCard flat border color="primary" variant="tonal">
               <VCardText>
                 <div class="text-overline text-medium-emphasis mb-2">Point Prediction</div>
-                <VProgressCircular v-if="predicting" indeterminate size="20" class="mb-2" />
+                <VProgressCircular v-if="predicting" indeterminate size="20" class="mb-2"/>
                 <VAlert v-else-if="predictError" type="error" variant="tonal" density="compact" class="mb-2">
                   {{ predictError }}
                 </VAlert>
@@ -141,8 +151,9 @@ watch(season, (newSeason) => {
                   </div>
                 </div>
 
-                <div v-if="prediction.suitability === null && selectedPoint" class="text-body-2 text-medium-emphasis py-2">
-                  <VIcon icon="ri-information-line" class="me-1" />
+                <div v-if="prediction.suitability === null && selectedPoint"
+                     class="text-body-2 text-medium-emphasis py-2">
+                  <VIcon icon="ri-information-line" class="me-1"/>
                   Click a point on the map to get prediction
                 </div>
 
@@ -152,22 +163,22 @@ watch(season, (newSeason) => {
                   </div>
                   <div class="d-flex flex-column gap-y-2">
                     <div class="d-flex align-center gap-x-2 text-body-2">
-                      <VIcon icon="ri-mountain-line" size="18" />
+                      <VIcon icon="ri-mountain-line" size="18"/>
                       Elevation: {{ prediction.elevation?.toFixed(0) || '--' }}m
                     </div>
                     <div class="d-flex align-center gap-x-2 text-body-2">
-                      <VIcon icon="ri-leaf-line" size="18" />
+                      <VIcon icon="ri-leaf-line" size="18"/>
                       CWBI: {{ prediction.ndvi?.toFixed(3) || '--' }}
                     </div>
                     <div class="d-flex align-center gap-x-2 text-body-2">
-                      <VIcon icon="ri-drop-line" size="18" />
+                      <VIcon icon="ri-drop-line" size="18"/>
                       Distance to water: {{ prediction.distToWater?.toFixed(1) || '--' }}km
                     </div>
                   </div>
                 </div>
 
                 <div v-else class="text-body-2 text-medium-emphasis py-2">
-                  <VIcon icon="ri-cursor-line" class="me-1" />
+                  <VIcon icon="ri-cursor-line" class="me-1"/>
                   Click the map to predict habitat suitability
                 </div>
               </VCardText>
@@ -176,7 +187,7 @@ watch(season, (newSeason) => {
             <!-- Show loading state -->
             <VCard v-if="loading" flat border>
               <VCardText class="text-center py-3">
-                <VProgressCircular indeterminate size="24" />
+                <VProgressCircular indeterminate size="24"/>
                 <span class="text-body-2 text-medium-emphasis ms-2">Loading sightings...</span>
               </VCardText>
             </VCard>
@@ -184,7 +195,7 @@ watch(season, (newSeason) => {
             <!-- Show error state -->
             <VCard v-if="error" flat border color="error">
               <VCardText class="text-center py-3">
-                <VIcon icon="ri-error-warning-line" color="error" />
+                <VIcon icon="ri-error-warning-line" color="error"/>
                 <span class="text-body-2 text-medium-emphasis ms-2">{{ error }}</span>
               </VCardText>
             </VCard>

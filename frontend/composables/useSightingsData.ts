@@ -1,15 +1,24 @@
 import { ref } from 'vue'
 
-// This will load from a JSON file you'll export from your notebook
+export interface Sighting {
+  decimalLatitude: number
+  decimalLongitude: number
+  countryCode: string
+  year: number
+  cluster?: number
+}
+
 export const useSightingsData = () => {
-  const sightings = ref<any[]>([])
+  const sightings = ref<Sighting[]>([])
   const loading = ref(true)
   const error = ref<string | null>(null)
 
   const loadSightings = async () => {
+    loading.value = true
+    error.value = null
+
     try {
       // In development, this loads from your static JSON file
-      // You'll generate this from your notebook data
       const data = await import('~/public/data/sightings.json')
       sightings.value = data.default || data
       loading.value = false
