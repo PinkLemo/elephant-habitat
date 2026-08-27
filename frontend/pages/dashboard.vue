@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import PublicNavbar from '@/layouts/components/PublicNavbar.vue'
+import MapCanvas from '@/components/map/MapCanvas.vue'
+import { useSightingsData } from '@/composables/useSightingsData'
 
 definePageMeta({
   path: '/dashboard',
@@ -11,31 +13,68 @@ definePageMeta({
 useHead({ title: 'Dashboard — Elephant Habitat' })
 
 // ─── Season toggle ─────────────────────────────────────────────────────────
-// Feeds season_encoded (1 = wet, 0 = dry) into the point prediction call
 const season = ref<'wet' | 'dry'>('wet')
 
 // ─── Map layer toggles ─────────────────────────────────────────────────────
-// Sightings + clusters read from the static GeoJSON cache; heatmap reads the
-// precomputed 100x100 suitability grid (see engine/build_geojson_cache.py)
 const layers = ref({
   sightings: true,
-  clusters: true,
+  clusters: false,
   heatmap: false,
+  studyArea: true,
 })
 
-// ─── Point prediction result ────────────────────────────────────────────────
-// Placeholder values until usePredictApi() wires this to POST /api/predict/point
-const prediction = ref({
-  suitability: 88,
-  elevation: 450,
-  ndvi: 0.34,
-  distToWater: 12,
+// ─── Point prediction state ──────────────────────────────────────────────
+const selectedPoint = ref<{ lat: number; lon: number } | null>(null)
+const prediction = ref<{
+  suitability: number | null
+  elevation: number | null
+  ndvi: number | null
+  distToWater: number | null
+}>({
+  suitability: null,
+  elevation: null,
+  ndvi: null,
+  distToWater: null,
 })
 
-// TODO: replace with a real map instance (Mapbox GL / Vue-Leaflet)
-// mounted into #map-canvas below. On map click, call usePredictApi()
-// with { lat, lon, season } and update `prediction`.
-const mapCanvas = ref<HTMLElement>()
+// ─── Load sightings data ──────────────────────────────────────────────────
+const { sightings, loading, error, loadSightings } = useSightingsData()
+
+onMounted(() => {
+  loadSightings()
+})
+
+// ─── Handle point selection from map ──────────────────────────────────────
+const { predictPoint, loading: predicting, error: predictError } = usePredictApi()
+
+const fetchPrediction = async (lat: number, lon: number, seasonValue: 'wet' | 'dry') => {
+  prediction.value = { suitability: null, elevation: null, ndvi: null, distToWater: null }
+
+  try {
+    const result = await predictPoint(lat, lon, seasonValue)
+    prediction.value = {
+      suitability: result.suitability,
+      elevation: result.elevation,
+      ndvi: result.ndvi_proxy,
+      distToWater: result.dist_to_water_km,
+    }
+  }
+  catch {
+    // predictError.value is already set by the composable — surface it in the template below
+  }
+}
+
+const handlePointSelected = (lat: number, lon: number) => {
+  selectedPoint.value = { lat, lon }
+  fetchPrediction(lat, lon, season.value)
+}
+
+// Toggling season with a point already selected re-scores that same point —
+// no need to click the map again
+watch(season, (newSeason) => {
+  if (selectedPoint.value)
+    fetchPrediction(selectedPoint.value.lat, selectedPoint.value.lon, newSeason)
+})
 </script>
 
 <template>
@@ -44,7 +83,6 @@ const mapCanvas = ref<HTMLElement>()
 
     <VContainer fluid class="py-6">
       <VRow>
-
         <!-- ── Sidebar controls ──────────────────────────────────────────── -->
         <VCol cols="12" md="3">
           <div class="d-flex flex-column gap-y-6">
@@ -52,16 +90,16 @@ const mapCanvas = ref<HTMLElement>()
             <VCard flat border>
               <VCardText>
                 <div class="text-overline text-medium-emphasis mb-3">Season</div>
-                <VBtnToggle v-model="season" mandatory color="primary" density="comfortable" divided class="w-100">
-                  <VBtn value="wet" class="flex-grow-1">
+                <VTabs v-model="season" class="v-tabs-pill" density="comfortable" grow>
+                  <VTab value="wet">
                     <VIcon start icon="ri-drop-line" />
                     Wet
-                  </VBtn>
-                  <VBtn value="dry" class="flex-grow-1">
+                  </VTab>
+                  <VTab value="dry">
                     <VIcon start icon="ri-sun-line" />
                     Dry
-                  </VBtn>
-                </VBtnToggle>
+                  </VTab>
+                </VTabs>
               </VCardText>
             </VCard>
 
@@ -81,6 +119,10 @@ const mapCanvas = ref<HTMLElement>()
                     v-model="layers.heatmap" color="primary" density="compact" hide-details
                     label="Suitability heatmap"
                   />
+                  <VSwitch
+                    v-model="layers.studyArea" color="primary" density="compact" hide-details
+                    label="Study area boundary"
+                  />
                 </div>
               </VCardText>
             </VCard>
@@ -88,23 +130,62 @@ const mapCanvas = ref<HTMLElement>()
             <VCard flat border color="primary" variant="tonal">
               <VCardText>
                 <div class="text-overline text-medium-emphasis mb-2">Point Prediction</div>
-                <div class="text-h3 font-weight-bold text-primary mb-3">
-                  {{ prediction.suitability }}%
-                </div>
-                <div class="d-flex flex-column gap-y-2">
-                  <div class="d-flex align-center gap-x-2 text-body-2">
-                    <VIcon icon="ri-mountain-line" size="18" />
-                    Elevation: {{ prediction.elevation }}m
-                  </div>
-                  <div class="d-flex align-center gap-x-2 text-body-2">
-                    <VIcon icon="ri-leaf-line" size="18" />
-                    NDVI proxy: {{ prediction.ndvi }}
-                  </div>
-                  <div class="d-flex align-center gap-x-2 text-body-2">
-                    <VIcon icon="ri-drop-line" size="18" />
-                    Distance to water: {{ prediction.distToWater }}km
+                <VProgressCircular v-if="predicting" indeterminate size="20" class="mb-2" />
+                <VAlert v-else-if="predictError" type="error" variant="tonal" density="compact" class="mb-2">
+                  {{ predictError }}
+                </VAlert>
+
+                <div v-if="selectedPoint" class="mb-2">
+                  <div class="text-caption text-medium-emphasis">
+                    {{ selectedPoint.lat.toFixed(4) }}, {{ selectedPoint.lon.toFixed(4) }}
                   </div>
                 </div>
+
+                <div v-if="prediction.suitability === null && selectedPoint" class="text-body-2 text-medium-emphasis py-2">
+                  <VIcon icon="ri-information-line" class="me-1" />
+                  Click a point on the map to get prediction
+                </div>
+
+                <div v-else-if="prediction.suitability !== null" class="d-flex flex-column gap-y-2">
+                  <div class="text-h3 font-weight-bold text-primary mb-2">
+                    {{ Math.round(prediction.suitability * 100) }}%
+                  </div>
+                  <div class="d-flex flex-column gap-y-2">
+                    <div class="d-flex align-center gap-x-2 text-body-2">
+                      <VIcon icon="ri-mountain-line" size="18" />
+                      Elevation: {{ prediction.elevation?.toFixed(0) || '--' }}m
+                    </div>
+                    <div class="d-flex align-center gap-x-2 text-body-2">
+                      <VIcon icon="ri-leaf-line" size="18" />
+                      CWBI: {{ prediction.ndvi?.toFixed(3) || '--' }}
+                    </div>
+                    <div class="d-flex align-center gap-x-2 text-body-2">
+                      <VIcon icon="ri-drop-line" size="18" />
+                      Distance to water: {{ prediction.distToWater?.toFixed(1) || '--' }}km
+                    </div>
+                  </div>
+                </div>
+
+                <div v-else class="text-body-2 text-medium-emphasis py-2">
+                  <VIcon icon="ri-cursor-line" class="me-1" />
+                  Click the map to predict habitat suitability
+                </div>
+              </VCardText>
+            </VCard>
+
+            <!-- Show loading state -->
+            <VCard v-if="loading" flat border>
+              <VCardText class="text-center py-3">
+                <VProgressCircular indeterminate size="24" />
+                <span class="text-body-2 text-medium-emphasis ms-2">Loading sightings...</span>
+              </VCardText>
+            </VCard>
+
+            <!-- Show error state -->
+            <VCard v-if="error" flat border color="error">
+              <VCardText class="text-center py-3">
+                <VIcon icon="ri-error-warning-line" color="error" />
+                <span class="text-body-2 text-medium-emphasis ms-2">{{ error }}</span>
               </VCardText>
             </VCard>
 
@@ -114,26 +195,14 @@ const mapCanvas = ref<HTMLElement>()
         <!-- ── Map canvas ────────────────────────────────────────────────── -->
         <VCol cols="12" md="9">
           <VCard flat border class="map-card">
-            <!-- Real map (Mapbox GL / Vue-Leaflet) mounts here -->
-            <div id="map-canvas" ref="mapCanvas" class="map-canvas">
-
-              <VChip class="map-overlay-chip top-left" size="small" variant="elevated">
-                <VIcon start icon="ri-map-2-line" size="16" />
-                Interactive map canvas
-              </VChip>
-
-              <!-- Placeholder hotspot markers — replace with real GeoJSON layer -->
-              <div class="hotspot-blob" style="inset-block-start: 130px; inset-inline-start: 200px; inline-size: 70px; block-size: 70px; background: rgb(var(--v-theme-error)); opacity: 0.45;" />
-              <div class="hotspot-blob" style="inset-block-start: 180px; inset-inline-start: 90px; inline-size: 40px; block-size: 40px; background: rgb(var(--v-theme-warning)); opacity: 0.55;" />
-              <div class="hotspot-blob" style="inset-block-start: 60px; inset-inline-start: 300px; inline-size: 30px; block-size: 30px; background: rgb(var(--v-theme-warning)); opacity: 0.45;" />
-              <div class="hotspot-dot" style="inset-block-start: 220px; inset-inline-start: 260px;" />
-              <div class="hotspot-dot" style="inset-block-start: 150px; inset-inline-start: 150px;" />
-
-              <VChip class="map-overlay-chip bottom-right" size="small" variant="elevated" color="primary">
-                <VIcon start icon="ri-cursor-line" size="16" />
-                Click to predict at point
-              </VChip>
-            </div>
+            <MapCanvas
+              :sightings="sightings"
+              :show-sightings="layers.sightings"
+              :show-clusters="layers.clusters"
+              :show-heatmap="layers.heatmap"
+              :show-study-area="layers.studyArea"
+              @point-selected="handlePointSelected"
+            />
           </VCard>
         </VCol>
 
@@ -145,40 +214,22 @@ const mapCanvas = ref<HTMLElement>()
 <style lang="scss" scoped>
 .map-card {
   overflow: hidden;
-}
+  height: 640px;
 
-.map-canvas {
-  position: relative;
-  block-size: 640px;
-  background: rgba(var(--v-theme-on-surface), 0.02);
-}
-
-.map-overlay-chip {
-  position: absolute;
-
-  &.top-left {
-    inset-block-start: 12px;
-    inset-inline-start: 12px;
-  }
-
-  &.bottom-right {
-    inset-block-end: 12px;
-    inset-inline-end: 12px;
+  :deep(.v-card-text) {
+    padding: 0;
+    height: 100%;
   }
 }
 
-.hotspot-blob {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
+.map-canvas-wrapper {
+  width: 100%;
+  height: 100%;
+  min-height: 600px;
 }
 
-.hotspot-dot {
-  position: absolute;
-  inline-size: 12px;
-  block-size: 12px;
-  border-radius: 50%;
-  background: rgb(var(--v-theme-primary));
-  pointer-events: none;
+.dashboard-page-wrapper {
+  // Ensure the map card doesn't overflow
+  overflow: hidden;
 }
 </style>

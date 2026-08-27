@@ -1,0 +1,185 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.093178,
+          -18.492822
+        ]
+      },
+      "properties": {
+        "cluster_id": 0,
+        "count": 2516,
+        "country": "BW"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.108385,
+          -21.136063
+        ]
+      },
+      "properties": {
+        "cluster_id": 1,
+        "count": 92,
+        "country": "ZW"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          30.295507,
+          -12.502648
+        ]
+      },
+      "properties": {
+        "cluster_id": 2,
+        "count": 15,
+        "country": "ZM"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          31.787435,
+          -12.94012
+        ]
+      },
+      "properties": {
+        "cluster_id": 3,
+        "count": 226,
+        "country": "ZM"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          29.12227,
+          -22.168754
+        ]
+      },
+      "properties": {
+        "cluster_id": 4,
+        "count": 48,
+        "country": "BW"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.982953,
+          -14.917158
+        ]
+      },
+      "properties": {
+        "cluster_id": 5,
+        "count": 63,
+        "country": "ZM"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          33.216337,
+          -19.722995
+        ]
+      },
+      "properties": {
+        "cluster_id": 6,
+        "count": 6,
+        "country": "MZ"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.37924,
+          -18.906199
+        ]
+      },
+      "properties": {
+        "cluster_id": 7,
+        "count": 33,
+        "country": "MZ"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          31.515723,
+          -18.463827
+        ]
+      },
+      "properties": {
+        "cluster_id": 8,
+        "count": 11,
+        "country": "ZW"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.85936,
+          -26.476858
+        ]
+      },
+      "properties": {
+        "cluster_id": 9,
+        "count": 18,
+        "country": "MZ"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          31.996351,
+          -23.685169
+        ]
+      },
+      "properties": {
+        "cluster_id": 11,
+        "count": 5,
+        "country": "MZ"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          38.019061,
+          -12.293525
+        ]
+      },
+      "properties": {
+        "cluster_id": 10,
+        "count": 8,
+        "country": "MZ"
+      }
+    }
+  ]
+}
