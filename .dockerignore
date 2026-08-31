@@ -1,0 +1,13 @@
+node_modules
+.nuxt
+.output
+.git
+.venv
+__pycache__
+*.pyc
+.env
+data/raw
+notebooks
+frontend/node_modules
+frontend/.nuxt
+frontend/.output

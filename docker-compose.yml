@@ -1,0 +1,27 @@
+# docker-compose.yml — for local testing, not itself a deployment target.
+# Run from the repo root: docker compose up --build
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - CORS_ORIGINS=http://localhost:3000
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      # NOTE: this is the browser's URL, not a docker-network address.
+      # Your dashboard's predict call runs client-side in the user's
+      # browser, so "http://backend:8000" (the internal service name)
+      # would NOT work here even though both containers share a network —
+      # the browser can't resolve docker-internal hostnames.
+      - NUXT_PUBLIC_API_BASE=http://localhost:8000
+    depends_on:
+      - backend

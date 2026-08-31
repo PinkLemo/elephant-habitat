@@ -9,6 +9,7 @@ Then check:
     http://localhost:8000/api/health  — should show model_loaded: true
 """
 
+import os
 import sys
 from pathlib import Path
 
@@ -31,13 +32,12 @@ app = FastAPI(title="Elephant Habitat API", version="1.0.0")
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# Restrict to actual known origins — never "*" once this isn't just a local test.
+# Comma-separated list, e.g. "https://your-frontend.vercel.app,http://localhost:3000"
+cors_origins = os.environ.get("CORS_ORIGINS", "http://localhost:3000").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        # "https://your-production-domain.com",  # add once the frontend is deployed
-    ],
+    allow_origins=cors_origins,
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
