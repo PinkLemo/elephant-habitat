@@ -254,10 +254,10 @@ const downloads = ref([
               </VCard>
             </VCol>
             <VCol cols="12" md="6">
-              <VCard flat color="success" variant="tonal">
+              <VCard flat color="info" variant="tonal">
                 <VCardText>
                   <div class="d-flex align-center gap-x-2">
-                    <VIcon icon="ri-tree-line" size="20" color="success" />
+                    <VIcon icon="ri-tree-line" size="20" color="info" />
                     <span class="text-body-2 font-weight-bold">Stage 2: Habitat Suitability</span>
                   </div>
                   <p class="text-body-2 text-medium-emphasis mt-2 mb-0">
@@ -356,7 +356,7 @@ const downloads = ref([
       <VCard flat border class="mb-8">
         <VCardText>
           <div class="d-flex align-center gap-x-2 mb-4">
-            <VIcon icon="ri-git-branch-line" color="primary" size="24" />
+            <VIcon icon="ri-git-branch-line" color="info" size="24" />
             <div class="text-overline text-medium-emphasis mb-0">Methodological Refinements</div>
           </div>
 
@@ -366,12 +366,12 @@ const downloads = ref([
           </p>
 
           <VTimeline align="start" side="end" density="comfortable" line-inset="8">
-            <VTimelineItem v-for="r in refinements" :key="r.title" dot-color="primary" size="small">
+            <VTimelineItem v-for="r in refinements" :key="r.title" dot-color="info" size="small">
               <template #icon>
                 <VIcon :icon="r.icon" size="16" color="white" />
               </template>
               <div class="mb-4">
-                <VChip color="primary" variant="tonal" size="small" class="mb-2 font-weight-bold" label>
+                <VChip color="info" variant="tonal" size="small" class="mb-2 font-weight-bold" label>
                   {{ r.title }}
                 </VChip>
                 <div class="text-body-2 text-medium-emphasis">
@@ -391,7 +391,7 @@ const downloads = ref([
       <!-- ── Limitations ────────────────────────────────────────────────── -->
       <VRow>
         <VCol cols="12" md="7">
-          <VCard flat border class="h-100">
+          <VCard flat border color="warning" variant="tonal" class="h-100">
             <VCardText>
               <div class="d-flex align-center gap-x-2 mb-4">
                 <VIcon icon="ri-alert-line" color="warning" size="24" />

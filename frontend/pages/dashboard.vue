@@ -119,19 +119,19 @@ watch(season, (newSeason) => {
                 <div class="text-overline text-medium-emphasis mb-3">Map Layers</div>
                 <div class="d-flex flex-column gap-y-1">
                   <VSwitch
-                    v-model="layers.sightings" color="primary" density="compact" hide-details
+                    v-model="layers.sightings" color="info" density="compact" hide-details
                     label="Elephant sightings"
                   />
                   <VSwitch
-                    v-model="layers.clusters" color="primary" density="compact" hide-details
+                    v-model="layers.clusters" color="info" density="compact" hide-details
                     label="DBSCAN clusters"
                   />
                   <VSwitch
-                    v-model="layers.heatmap" color="primary" density="compact" hide-details
+                    v-model="layers.heatmap" color="info" density="compact" hide-details
                     label="Suitability heatmap"
                   />
                   <VSwitch
-                    v-model="layers.studyArea" color="primary" density="compact" hide-details
+                    v-model="layers.studyArea" color="info" density="compact" hide-details
                     label="Study area boundary"
                   />
                 </div>

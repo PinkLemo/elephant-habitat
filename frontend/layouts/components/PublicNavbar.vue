@@ -41,7 +41,7 @@ const sidebar = ref(false)
 
         <div class="d-flex align-center">
           <VAppBarTitle class="me-3 me-sm-6">
-            <NuxtLink to="/frontend/public" class="d-flex gap-x-3 align-center text-decoration-none">
+            <NuxtLink to="/" class="d-flex gap-x-3 align-center text-decoration-none">
               <VNodeRenderer :nodes="themeConfig.app.logo" />
               <span class="nav-title">Elephant Habitat</span>
             </NuxtLink>

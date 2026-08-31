@@ -14,9 +14,9 @@ useHead({ title: 'Elephant Habitat — MSc Dissertation' })
 // ─── Stat data (from the dissertation results_summary.json) ──────────────────
 const statData = ref([
   { title: 'DBSCAN Clusters', value: '12', icon: 'ri-focus-3-line', color: 'primary' },
-  { title: 'Spatial CV AUC', value: '0.885', icon: 'ri-line-chart-line', color: 'success' },
+  { title: 'Spatial CV AUC', value: '0.885', icon: 'ri-line-chart-line', color: 'info' },
   { title: 'Occurrence Records', value: '3,067', icon: 'ri-map-pin-line', color: 'warning' },
-  { title: 'Countries Covered', value: '4', icon: 'ri-earth-line', color: 'info' },
+  { title: 'Countries Covered', value: '4', icon: 'ri-earth-line', color: 'success' },
 ])
 </script>
 

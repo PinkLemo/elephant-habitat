@@ -118,7 +118,7 @@ const conservationImplications = ref([
       </div>
 
       <!-- ── Model Configuration ───────────────────────────────────────── -->
-      <VCard flat border class="mb-8">
+      <VCard flat border class="mb-8" style="background: rgba(var(--v-theme-primary), 0.04);">
         <VCardText>
           <div class="d-flex align-center gap-x-2 mb-4">
             <VIcon icon="ri-settings-3-line" color="primary" size="24" />
@@ -152,13 +152,13 @@ const conservationImplications = ref([
           </VCard>
         </VCol>
         <VCol cols="12" md="6">
-          <VCard flat border color="primary" variant="tonal" class="h-100">
+          <VCard flat border color="info" variant="tonal" class="h-100">
             <VCardText>
               <div class="d-flex align-center gap-x-2 mb-2">
-                <VIcon icon="ri-checkbox-circle-line" color="primary" size="20" />
+                <VIcon icon="ri-checkbox-circle-line" color="info" size="20" />
                 <span class="text-overline text-medium-emphasis">Spatial Block CV (reported)</span>
               </div>
-              <div class="text-h3 font-weight-bold text-primary">0.8850</div>
+              <div class="text-h3 font-weight-bold text-info">0.8850</div>
               <p class="text-caption text-medium-emphasis mt-2 mb-0">
                 Std. dev. <strong>0.0772</strong> — the honest, generalisable estimate of model skill.
                 <span class="d-block mt-1">Difference: <strong>0.1134</strong> AUC units of inflation avoided.</span>
@@ -311,10 +311,10 @@ const conservationImplications = ref([
       <!-- ── Conservation Implications ───────────────────────────────────── -->
       <VRow class="mt-8">
         <VCol cols="12">
-          <VCard flat border color="primary" variant="tonal">
+          <VCard flat border color="info" variant="tonal">
             <VCardText>
               <div class="d-flex align-center gap-x-2 mb-4">
-                <VIcon icon="ri-earth-line" color="primary" size="24" />
+                <VIcon icon="ri-earth-line" color="info" size="24" />
                 <div class="text-overline text-medium-emphasis mb-0">Conservation Implications</div>
               </div>
 

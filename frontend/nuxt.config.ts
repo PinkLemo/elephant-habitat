@@ -6,8 +6,8 @@ import vuetify from 'vite-plugin-vuetify'
 export default defineNuxtConfig({
   app: {
     head: {
-      titleTemplate: '%s - NuxtJS Admin Template',
-      title: 'Materialize',
+      titleTemplate: '%s - Daliso Miti',
+      title: 'Elephant Habitat',
 
       link: [{
         rel: 'icon',
