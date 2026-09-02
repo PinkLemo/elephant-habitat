@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import {ref, onMounted, watch} from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
+import { useCountryColors } from '@/composables/useCountryColors'
 
 // Fix for Leaflet's default marker icons in Vue
 delete (L.Icon.Default.prototype as any)._getIconUrl
@@ -33,46 +34,50 @@ const mapContainer = ref<HTMLDivElement>()
 let map: L.Map | null = null
 let markerLayer: L.LayerGroup | null = null
 let boundaryLayer: L.Rectangle | null = null
+let selectedMarker: L.CircleMarker | null = null
 
-// Country colours matching your notebook
-const countryColors: Record<string, string> = {
-  ZW: '#00ff00',
-  MZ: '#ff8c00',
-  ZM: '#0000ff',
-  BW: '#ff0000'
-}
+// Single source of truth for country colors — also used in the dashboard's
+// legend card, so a sighting's dot always matches its legend entry.
+const { COUNTRY_COLORS } = useCountryColors()
 
-// Cluster colours (12 clusters from your DBSCAN)
+// Cluster colours (12 clusters from your DBSCAN) — cycles by cluster id,
+// no fixed name-to-color mapping, so the legend explains this via hover text
+// rather than listing all 12.
 const clusterColors = [
   '#FF0000', '#0066FF', '#00CC00', '#9900CC', '#FF6600',
   '#CC0066', '#FFCC00', '#00CCCC', '#CC9900', '#FF3399',
-  '#339966', '#993366'
+  '#339966', '#993366',
 ]
 
+// Matches the app's theme primary — used for both the study area outline
+// and the selected-point marker so the two "your input" elements read as
+// visually related.
+const ACCENT_COLOR = '#7367F0'
+
 const initMap = () => {
-  if (!mapContainer.value) return
+  if (!mapContainer.value)
+    return
 
   map = L.map(mapContainer.value, {
     center: [-18, 30],
     zoom: 5,
-    zoomControl: true
+    zoomControl: true,
   })
 
-  // Add OpenStreetMap tile layer
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors',
-    maxZoom: 19
+    maxZoom: 19,
   }).addTo(map)
 
   // Exact bounding box from Chapter 3.1.2 — same extent used for
   // pseudo-absence generation and the prediction grid
   const STUDY_AREA_BOUNDS: L.LatLngBoundsExpression = [
     [-26, 20], // SW corner
-    [-8, 36],  // NE corner
+    [-8, 36], // NE corner
   ]
 
   boundaryLayer = L.rectangle(STUDY_AREA_BOUNDS, {
-    color: '#7367F0',
+    color: ACCENT_COLOR,
     weight: 2,
     dashArray: '6 6',
     fill: false,
@@ -81,14 +86,26 @@ const initMap = () => {
   if (props.showStudyArea)
     boundaryLayer.addTo(map)
 
-  // Handle click events
+  // Handle click events — mark exactly where the user clicked, replacing
+  // any previous selection, so the prediction card's coordinates always
+  // have a visible anchor on the map itself.
   map.on('click', (e: L.LeafletMouseEvent) => {
+    if (selectedMarker)
+      selectedMarker.removeFrom(map!)
+
+    selectedMarker = L.circleMarker(e.latlng, {
+      radius: 9,
+      color: '#ffffff',
+      weight: 3,
+      fillColor: ACCENT_COLOR,
+      fillOpacity: 1,
+    }).addTo(map!)
+
     emit('pointSelected', e.latlng.lat, e.latlng.lng)
   })
 
   renderLayers()
 
-  // Resize map after a moment (ensures proper rendering)
   setTimeout(() => {
     map?.invalidateSize()
   }, 100)
@@ -101,9 +118,9 @@ watch(() => props.showStudyArea, (visible) => {
 })
 
 const renderLayers = () => {
-  if (!map) return
+  if (!map)
+    return
 
-  // Remove existing layers
   if (markerLayer) {
     markerLayer.clearLayers()
     markerLayer.removeFrom(map)
@@ -111,14 +128,14 @@ const renderLayers = () => {
 
   markerLayer = L.layerGroup().addTo(map)
 
-  if (!props.sightings || props.sightings.length === 0) return
-
-  let pointsToShow = props.sightings
+  if (!props.sightings || props.sightings.length === 0)
+    return
 
   props.sightings.forEach((sighting) => {
     const lat = sighting.decimalLatitude
     const lon = sighting.decimalLongitude
-    if (!lat || !lon) return
+    if (!lat || !lon)
+      return
 
     let color = '#888888'
     let radius = 4
@@ -128,20 +145,17 @@ const renderLayers = () => {
       color = clusterColors[sighting.cluster % clusterColors.length]
       radius = 6
       popupText = `Cluster ${sighting.cluster} - ${sighting.countryCode} - ${sighting.year}`
-    } else if (props.showSightings && !props.showClusters) {
-      color = countryColors[sighting.countryCode] || '#888888'
+    }
+    else if (props.showSightings && !props.showClusters) {
+      color = COUNTRY_COLORS[sighting.countryCode] || '#888888'
       radius = 4
-    } else if (!props.showSightings && !props.showClusters) {
+    }
+    else if (!props.showSightings && !props.showClusters) {
       return // Don't show anything if both are off
     }
 
-    // For the heatmap overlay, we'd use a different approach
-    // but for now we just show points
-    if (props.showHeatmap) {
-      // This would be a different layer type
-      // For simplicity, we'll use circles with varying opacity
+    if (props.showHeatmap)
       radius = 8
-    }
 
     const circle = L.circleMarker([lat, lon], {
       radius,
@@ -149,7 +163,7 @@ const renderLayers = () => {
       fillColor: color,
       fillOpacity: props.showHeatmap ? 0.3 : 0.7,
       weight: 1,
-      opacity: 0.8
+      opacity: 0.8,
     })
 
     circle.bindPopup(popupText)
@@ -157,20 +171,18 @@ const renderLayers = () => {
   })
 }
 
-// Watch for layer toggle changes
 watch(() => [props.showSightings, props.showClusters, props.showHeatmap], () => {
   renderLayers()
 })
 
 watch(() => props.sightings, () => {
   renderLayers()
-}, {deep: true})
+}, { deep: true })
 
 onMounted(() => {
   initMap()
 })
 
-// Cleanup
 const cleanup = () => {
   if (map) {
     map.remove()
@@ -178,14 +190,12 @@ const cleanup = () => {
   }
 }
 
-// Component cleanup
-if (import.meta.hot) {
+if (import.meta.hot)
   import.meta.hot.dispose(cleanup)
-}
 </script>
 
 <template>
-  <div ref="mapContainer" class="map-canvas-wrapper"></div>
+  <div ref="mapContainer" class="map-canvas-wrapper" />
 </template>
 
 <style scoped>

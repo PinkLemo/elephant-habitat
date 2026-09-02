@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import PublicNavbar from '@/layouts/components/PublicNavbar.vue'
-import Footer from "@/layouts/components/Footer.vue";
+import Footer from '@/layouts/components/Footer.vue'
 
 definePageMeta({
   path: '/habitat-model',
@@ -18,16 +18,16 @@ const modelMetrics = ref([
   { label: 'Max Depth', value: '12' },
   { label: 'Min Samples Split', value: '10' },
   { label: 'Training Records', value: '6,134' },
-  { label: 'Test Records (per fold)', value: '~1,200' },
+  { label: 'Test Records (per fold)', value: '421–2,609' },
 ])
 
-// ─── Spatial block CV results (Table 3) ─────────────────────────────────────
+// ─── Spatial block CV results (Table 3 + Cell 16 block sizes) ──────────────
 const blocks = ref([
-  { block: 'Block 1 (Northernmost)', range: '~8°S to ~11°S', auc: 0.8976 },
-  { block: 'Block 2', range: '~11°S to ~14°S', auc: 0.8840 },
-  { block: 'Block 3', range: '~14°S to ~18°S', auc: 0.9704 },
-  { block: 'Block 4', range: '~18°S to ~22°S', auc: 0.9302 },
-  { block: 'Block 5 (Southernmost)', range: '~22°S to ~26°S', auc: 0.7425 },
+  { block: 'Block 1 (Northernmost)', range: '~8°S to ~11°S', n: 647, auc: 0.8976 },
+  { block: 'Block 2', range: '~11°S to ~14°S', n: 1561, auc: 0.8840 },
+  { block: 'Block 3', range: '~14°S to ~18°S', n: 2609, auc: 0.9704 },
+  { block: 'Block 4', range: '~18°S to ~22°S', n: 421, auc: 0.9302 },
+  { block: 'Block 5 (Southernmost)', range: '~22°S to ~26°S', n: 896, auc: 0.7425 },
 ])
 
 // ─── Feature importance (Section 4.3.2) ─────────────────────────────────────
@@ -36,25 +36,25 @@ const features = ref([
     name: 'CWBI (Climatic Water Balance Index)',
     importance: 0.4861,
     description: 'Ratio of annual precipitation to potential evapotranspiration — measures moisture-driven vegetation productivity',
-    color: 'primary'
+    color: 'primary',
   },
   {
     name: 'Distance to Water',
     importance: 0.3204,
     description: 'Great-circle distance to nearest permanent water body — critical for daily drinking requirements',
-    color: 'success'
+    color: 'success',
   },
   {
     name: 'Elevation',
     importance: 0.1891,
     description: 'Elevation above sea level — reflects preference for lower-lying river valleys and floodplains',
-    color: 'warning'
+    color: 'warning',
   },
   {
     name: 'Season',
     importance: 0.0044,
     description: 'Binary wet/dry season encoding — negligible impact at regional scale',
-    color: 'grey'
+    color: 'grey',
   },
 ])
 
@@ -184,6 +184,7 @@ const conservationImplications = ref([
                 <tr>
                   <th>Block</th>
                   <th>Latitude Range</th>
+                  <th class="text-end">Records</th>
                   <th class="text-end">AUC</th>
                   <th class="text-end">Performance</th>
                 </tr>
@@ -192,6 +193,7 @@ const conservationImplications = ref([
                 <tr v-for="b in blocks" :key="b.block">
                   <td class="text-body-2">{{ b.block }}</td>
                   <td class="text-body-2 text-medium-emphasis">{{ b.range }}</td>
+                  <td class="text-body-2 text-end text-medium-emphasis">{{ b.n.toLocaleString() }}</td>
                   <td class="text-body-2 text-end font-weight-medium">{{ b.auc.toFixed(4) }}</td>
                   <td class="text-end">
                     <VChip
@@ -207,18 +209,18 @@ const conservationImplications = ref([
                 </tbody>
                 <tfoot>
                 <tr>
-                  <td colspan="2" class="text-body-2 font-weight-bold">Mean</td>
+                  <td colspan="3" class="text-body-2 font-weight-bold">Mean</td>
                   <td class="text-body-2 text-end font-weight-bold text-primary">
                     {{ blockSummary.mean.toFixed(4) }}
                   </td>
-                  <td></td>
+                  <td />
                 </tr>
                 <tr>
-                  <td colspan="2" class="text-body-2 text-medium-emphasis">Std. Deviation</td>
+                  <td colspan="3" class="text-body-2 text-medium-emphasis">Std. Deviation</td>
                   <td class="text-body-2 text-end text-medium-emphasis">
                     {{ blockSummary.stdDev.toFixed(4) }}
                   </td>
-                  <td></td>
+                  <td />
                 </tr>
                 </tfoot>
               </VTable>
@@ -229,6 +231,12 @@ const conservationImplications = ref([
                 <span>Max AUC: <strong>{{ blockSummary.max.toFixed(4) }}</strong> (Block 3)</span>
                 <span>Range: <strong>{{ (blockSummary.max - blockSummary.min).toFixed(4) }}</strong></span>
               </div>
+              <p class="text-caption text-medium-emphasis mt-3 mb-0">
+                Performance bands follow standard AUC interpretation convention
+                (excellent ≥0.9, good ≥0.8, moderate &lt;0.8) — not a threshold defined
+                by this study. Block 3's larger sample (2,609 records) likely makes its
+                AUC the most stable estimate; Block 4's smaller sample (421) the least.
+              </p>
             </VCardText>
           </VCard>
         </VCol>
@@ -251,7 +259,10 @@ const conservationImplications = ref([
                 <div v-for="f in features" :key="f.name">
                   <div class="d-flex justify-space-between mb-1">
                     <span class="text-body-2 font-weight-medium">{{ f.name }}</span>
-                    <span class="text-body-2 font-weight-bold" :class="f.color === 'grey' ? 'text-medium-emphasis' : `text-${f.color}`">
+                    <span
+                      class="text-body-2 font-weight-bold"
+                      :class="f.color === 'grey' ? 'text-medium-emphasis' : `text-${f.color}`"
+                    >
                       {{ (f.importance * 100).toFixed(1) }}%
                     </span>
                   </div>

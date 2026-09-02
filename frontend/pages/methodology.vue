@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import PublicNavbar from '@/layouts/components/PublicNavbar.vue'
-import Footer from "@/layouts/components/Footer.vue";
+import Footer from '@/layouts/components/Footer.vue'
 
 definePageMeta({
   path: '/methodology',
@@ -84,26 +84,30 @@ const dataSources = ref([
 ])
 
 // ─── Environmental predictors ──────────────────────────────────────────────
+// Colors match habitat-model.vue's `features` array so the same variable
+// reads as the same color on both pages. Bars are absolute (0–100), not
+// rescaled to the max — a rescaled bar would show CWBI at 100% width,
+// visually overstating a 48.6% importance score.
 const predictors = ref([
   {
     name: 'CWBI (Climatic Water Balance Index)',
-    importance: '48.6%',
-    description: 'Ratio of annual precipitation to potential evapotranspiration — measures moisture-driven vegetation productivity',
+    importance: 48.6,
+    color: 'primary',
   },
   {
     name: 'Distance to Water',
-    importance: '32.0%',
-    description: 'Great-circle distance to nearest permanent water body — critical for daily drinking requirements',
+    importance: 32.0,
+    color: 'success',
   },
   {
     name: 'Elevation',
-    importance: '18.9%',
-    description: 'Elevation above sea level — reflects preference for lower-lying river valleys and floodplains',
+    importance: 18.9,
+    color: 'warning',
   },
   {
     name: 'Season',
-    importance: '0.4%',
-    description: 'Binary wet/dry season encoding — negligible at regional scale',
+    importance: 0.4,
+    color: 'grey',
   },
 ])
 
@@ -289,10 +293,10 @@ const downloads = ref([
 
           <VRow>
             <VCol cols="12" md="6">
-              <VCard flat border color="error" variant="tonal">
+              <VCard flat border color="warning" variant="tonal">
                 <VCardText class="text-center">
                   <div class="text-overline text-medium-emphasis">Random Split (inflated)</div>
-                  <div class="text-h3 font-weight-bold text-error">0.9984</div>
+                  <div class="text-h3 font-weight-bold text-warning">0.9984</div>
                   <p class="text-caption text-medium-emphasis mt-1 mb-0">
                     Overestimated due to spatial leakage between nearby train/test points
                   </p>
@@ -311,6 +315,12 @@ const downloads = ref([
               </VCard>
             </VCol>
           </VRow>
+
+          <div class="text-end mt-3">
+            <NuxtLink to="/habitat-model" class="text-body-2 text-primary font-weight-medium">
+              See the full per-block breakdown →
+            </NuxtLink>
+          </div>
         </VCardText>
       </VCard>
 
@@ -331,24 +341,31 @@ const downloads = ref([
             <div v-for="p in predictors" :key="p.name">
               <div class="d-flex justify-space-between mb-1">
                 <span class="text-body-2 font-weight-medium">{{ p.name }}</span>
-                <span class="text-body-2 font-weight-bold text-primary">{{ p.importance }}</span>
+                <span
+                  class="text-body-2 font-weight-bold"
+                  :class="p.color === 'grey' ? 'text-medium-emphasis' : `text-${p.color}`"
+                >
+                  {{ p.importance.toFixed(1) }}%
+                </span>
               </div>
               <VProgressLinear
-                :model-value="parseFloat(p.importance) * 100 / 48.6"
-                :color="parseFloat(p.importance) > 30 ? 'primary' : 'grey'"
+                :model-value="p.importance"
+                :color="p.color === 'grey' ? 'grey' : p.color"
                 height="6"
                 rounded
                 bg-color="rgba(var(--v-theme-on-surface), 0.06)"
               />
-              <p class="text-caption text-medium-emphasis mt-1">{{ p.description }}</p>
             </div>
           </div>
 
           <VDivider class="my-4" />
-          <p class="text-caption text-medium-emphasis">
+          <p class="text-caption text-medium-emphasis mb-2">
             <strong>Combined importance:</strong> CWBI and distance to water together account for
             <strong>80.6%</strong> of the model's predictive power.
           </p>
+          <NuxtLink to="/habitat-model" class="text-body-2 text-primary font-weight-medium">
+            See detailed feature analysis →
+          </NuxtLink>
         </VCardText>
       </VCard>
 
@@ -442,28 +459,28 @@ const downloads = ref([
       </VRow>
 
       <!-- ── Downloads ──────────────────────────────────────────────────── -->
-      <VCard flat border class="mt-8">
-        <VCardText>
-          <div class="d-flex align-center gap-x-2 mb-4">
-            <VIcon icon="ri-download-2-line" color="primary" size="24" />
-            <div class="text-overline text-medium-emphasis mb-0">Downloads &amp; Further Resources</div>
-          </div>
+<!--      <VCard flat border class="mt-8">-->
+<!--        <VCardText>-->
+<!--          <div class="d-flex align-center gap-x-2 mb-4">-->
+<!--            <VIcon icon="ri-download-2-line" color="primary" size="24" />-->
+<!--            <div class="text-overline text-medium-emphasis mb-0">Downloads &amp; Further Resources</div>-->
+<!--          </div>-->
 
-          <div class="d-flex flex-wrap gap-3">
-            <VBtn
-              v-for="d in downloads"
-              :key="d.label"
-              :href="d.href"
-              variant="tonal"
-              color="primary"
-              class="flex-grow-1 flex-md-grow-0"
-            >
-              <VIcon :icon="d.icon" start />
-              {{ d.label }}
-            </VBtn>
-          </div>
-        </VCardText>
-      </VCard>
+<!--          <div class="d-flex flex-wrap gap-3">-->
+<!--            <VBtn-->
+<!--              v-for="d in downloads"-->
+<!--              :key="d.label"-->
+<!--              :href="d.href"-->
+<!--              variant="tonal"-->
+<!--              color="primary"-->
+<!--              class="flex-grow-1 flex-md-grow-0"-->
+<!--            >-->
+<!--              <VIcon :icon="d.icon" start />-->
+<!--              {{ d.label }}-->
+<!--            </VBtn>-->
+<!--          </div>-->
+<!--        </VCardText>-->
+<!--      </VCard>-->
     </VContainer>
   </div>
   <!-- ═══════════════════════════════════════════════════════════ FOOTER ═══ -->
